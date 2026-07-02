@@ -508,17 +508,17 @@ select, input[type=number] { font-size: 16px; } /* prevent auto-zoom on iOS */
   </header>
 
   <nav class="tabs" role="tablist">
-    <button class="tab-btn active" role="tab" data-tab="dossier">Individual Car Assessment</button>
-    <button class="tab-btn" role="tab" data-tab="ranking">Brand specific Car Assessment</button>
-    <button class="tab-btn" role="tab" data-tab="brands">Assessment across Brands</button>
-    <button class="tab-btn" role="tab" data-tab="restoration">Restoration Break-Even</button>
-    <button class="tab-btn" role="tab" data-tab="categories">Categories</button>
-    <button class="tab-btn" role="tab" data-tab="methodology">Methodology</button>
+    <button class="tab-btn active" role="tab" id="tab-dossier" aria-controls="page-dossier" aria-selected="true" tabindex="0" data-tab="dossier">Individual Car Assessment</button>
+    <button class="tab-btn" role="tab" id="tab-ranking" aria-controls="page-ranking" aria-selected="false" tabindex="-1" data-tab="ranking">Brand specific Car Assessment</button>
+    <button class="tab-btn" role="tab" id="tab-brands" aria-controls="page-brands" aria-selected="false" tabindex="-1" data-tab="brands">Assessment across Brands</button>
+    <button class="tab-btn" role="tab" id="tab-restoration" aria-controls="page-restoration" aria-selected="false" tabindex="-1" data-tab="restoration">Restoration Break-Even</button>
+    <button class="tab-btn" role="tab" id="tab-categories" aria-controls="page-categories" aria-selected="false" tabindex="-1" data-tab="categories">Categories</button>
+    <button class="tab-btn" role="tab" id="tab-methodology" aria-controls="page-methodology" aria-selected="false" tabindex="-1" data-tab="methodology">Methodology</button>
   </nav>
   
 
   <!-- PAGE 1: DOSSIER -->
-  <div class="page active" id="page-dossier">
+  <div class="page active" id="page-dossier" role="tabpanel" aria-labelledby="tab-dossier">
     <section class="deck">
       <div class="deck-label">Select vehicle</div>
       <div class="controls five">
@@ -546,7 +546,7 @@ select, input[type=number] { font-size: 16px; } /* prevent auto-zoom on iOS */
   </div>
 
   <!-- PAGE 2: RANKING -->
-  <div class="page" id="page-ranking">
+  <div class="page" id="page-ranking" role="tabpanel" aria-labelledby="tab-ranking">
     <section class="deck">
       <div class="deck-label">Select brand &amp; filters</div>
       <div class="controls" style="grid-template-columns:200px 190px 170px 165px;gap:14px;">
@@ -589,7 +589,7 @@ select, input[type=number] { font-size: 16px; } /* prevent auto-zoom on iOS */
   </div>
 
   <!-- PAGE 4: INVESTMENT CATEGORIES -->
-  <div class="page" id="page-categories">
+  <div class="page" id="page-categories" role="tabpanel" aria-labelledby="tab-categories">
     <div class="meth-grid">
 
         <div class="meth-card" style="margin-top:0;">
@@ -696,7 +696,7 @@ select, input[type=number] { font-size: 16px; } /* prevent auto-zoom on iOS */
   </div><!-- /page-categories -->
 
   <!-- PAGE 3: METHODOLOGY -->
-  <div class="page" id="page-methodology">
+  <div class="page" id="page-methodology" role="tabpanel" aria-labelledby="tab-methodology">
     <div class="meth-grid">
 
       <!-- col 1 -->
@@ -848,7 +848,7 @@ select, input[type=number] { font-size: 16px; } /* prevent auto-zoom on iOS */
   <footer><small id="footerCount" style="font-size:9.5px;">1,340 vehicles · 63 marques</small><small style="font-size:9.5px;"> · Figures are directional planning estimates, not appraisals</small></footer>
 
   <!-- PAGE 5: COMPARATIVE ANALYSIS ACROSS BRANDS -->
-  <div class="page" id="page-brands">
+  <div class="page" id="page-brands" role="tabpanel" aria-labelledby="tab-brands">
     <div class="brands-controls">
       <div class="field">
         <label for="brandsCountrySel">Country</label>
@@ -874,7 +874,7 @@ select, input[type=number] { font-size: 16px; } /* prevent auto-zoom on iOS */
 
 
   <!-- PAGE: RESTORATION BREAK-EVEN -->
-  <div class="page" id="page-restoration">
+  <div class="page" id="page-restoration" role="tabpanel" aria-labelledby="tab-restoration">
 
     <div class="resto-controls">
       <div class="field">
@@ -1186,12 +1186,27 @@ function co2Spec(co2,years,displacement,fuel){
 /* ── Image search: Commons category → Wikidata → Wikipedia → Commons file ── */
 
 
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('page-'+btn.dataset.tab).classList.add('active');
+const tabBtns=[...document.querySelectorAll('.tab-btn')];
+function activateTab(btn,focus){
+  tabBtns.forEach(b=>{
+    const on=b===btn;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-selected',on?'true':'false');
+    b.tabIndex=on?0:-1;
+  });
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+btn.dataset.tab).classList.add('active');
+  if(focus)btn.focus();
+}
+tabBtns.forEach((btn,i)=>{
+  btn.addEventListener('click',()=>activateTab(btn,false));
+  btn.addEventListener('keydown',e=>{
+    let next=-1;
+    if(e.key==='ArrowRight'||e.key==='ArrowDown')next=(i+1)%tabBtns.length;
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp')next=(i-1+tabBtns.length)%tabBtns.length;
+    else if(e.key==='Home')next=0;
+    else if(e.key==='End')next=tabBtns.length-1;
+    if(next>=0){e.preventDefault();activateTab(tabBtns[next],true);}
   });
 });
 
