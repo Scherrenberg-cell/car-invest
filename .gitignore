@@ -1,0 +1,4 @@
+.env
+image_sourcing_report.csv
+__pycache__/
+*.pyc
