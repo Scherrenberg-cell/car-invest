@@ -1,0 +1,17 @@
+{
+  "name": "Carnomics — Valuation is only half the equation",
+  "short_name": "Carnomics",
+  "description": "Classic and youngtimer car ownership analysis: value, running costs and what is left when you put the two together.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f6f5",
+  "theme_color": "#ffffff",
+  "lang": "en",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
